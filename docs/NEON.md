@@ -40,3 +40,9 @@ Complete the browser login requested by the CLI. Verify the region supports Neon
 ## Website integration
 
 This provisions a Neon backend bucket, not Django hosting. The existing app still uses Neon PostgreSQL plus Cloudflare R2 when persistent hosting is configured. The new Neon bucket is not yet connected to the app's storage backend; that change needs the verified endpoint/credentials and a separate upload/playback validation. Existing local/R2 content has not been copied or removed.
+
+## Latest access status
+
+Neon API network access now succeeds (HTTP 401 when unauthenticated). CLI OAuth starts, but its callback listens on cloud-machine localhost, which is not directly reachable from the user's external browser. No API key or completed CLI session is available yet.
+
+A `NEON_API_KEY` requirement is saved in Codex environment settings, scoped to the HTTPS destination `console.neon.tech`. The user should enter a Neon API key securely there and apply/publish the settings. Do not send the key in chat. Once injected, use the CLI's existing `NEON_API_KEY` support to verify project/branch access, plan, deploy and inspect the bucket. Do not extract proxy credentials. Render API network access is still blocked; resolving Neon provisioning alone does not publish the Django site.

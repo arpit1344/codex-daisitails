@@ -28,3 +28,9 @@
 - Login/link/deploy attempts are blocked by the network proxy (HTTP 403); remote project, region and bucket state remain unverified.
 - Required Neon domains are saved in the cloud network draft. Runtime access and Neon login must be completed before deployment can resume.
 - See docs/NEON.md. Django uploads still use the existing R2 configuration; Neon object storage has not been connected.
+
+## Current access update
+- Neon API now responds over the configured network; the previous network block is resolved for Neon.
+- CLI browser login starts but its loopback callback cannot be completed from the user's external browser through available tools.
+- No CLI credential or injected NEON_API_KEY exists yet. A destination-scoped NEON_API_KEY requirement is saved for secure entry in Codex environment settings.
+- Link/deploy and private bucket verification remain pending that credential. Render API access remains blocked; no public website URL exists yet.
