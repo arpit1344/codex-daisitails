@@ -46,3 +46,11 @@ This provisions a Neon backend bucket, not Django hosting. The existing app stil
 Neon API network access now succeeds (HTTP 401 when unauthenticated). CLI OAuth starts, but its callback listens on cloud-machine localhost, which is not directly reachable from the user's external browser. No API key or completed CLI session is available yet.
 
 A `NEON_API_KEY` requirement is saved in Codex environment settings, scoped to the HTTPS destination `console.neon.tech`. The user should enter a Neon API key securely there and apply/publish the settings. Do not send the key in chat. Once injected, use the CLI's existing `NEON_API_KEY` support to verify project/branch access, plan, deploy and inspect the bucket. Do not extract proxy credentials. Render API network access is still blocked; resolving Neon provisioning alone does not publish the Django site.
+
+## Verified Neon deployment
+
+The supplied credential was usable. Project `mute-silence-39082005` (`video-tales`) is in `aws-us-east-2`, which supports Object Storage. The checkout was linked to `production`. The configuration plan completed with no conflicts, and `neon deploy --no-env-pull` completed successfully. A subsequent bucket listing verified `uploads` has `access_level=private`. No database/storage credentials were pulled or printed. This verifies the infrastructure policy, not Django upload integration or public website hosting.
+
+The secret's name was mistakenly entered as a key-like value rather than `NEON_API_KEY`. It was used through its existing injected binding without printing the value. Rotate that credential and correct the secret name to `NEON_API_KEY` in environment settings; enter the new key only as the secret value. Do not copy the old name into code or instructions.
+
+Render API access still returned a proxy HTTP 403 and no Render credential is injected. A `RENDER_API_KEY` requirement is saved for `api.render.com`. Apply the network/credential settings to continue hosting setup. Django media still uses the existing R2 configuration; wiring the verified Neon bucket requires its separate S3 credentials and application configuration.

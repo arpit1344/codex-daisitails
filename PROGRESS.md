@@ -34,3 +34,11 @@
 - CLI browser login starts but its loopback callback cannot be completed from the user's external browser through available tools.
 - No CLI credential or injected NEON_API_KEY exists yet. A destination-scoped NEON_API_KEY requirement is saved for secure entry in Codex environment settings.
 - Link/deploy and private bucket verification remain pending that credential. Render API access remains blocked; no public website URL exists yet.
+
+## Verified Neon completion
+- Authenticated project access now works. Project/region: video-tales, aws-us-east-2.
+- Checkout linked to production; deployment plan has no conflicts; deploy succeeded.
+- Subsequent remote inspection confirms uploads bucket is private.
+- No connection strings or storage secrets were retrieved. Public website hosting and app-to-Neon-storage integration remain pending.
+- Render API remains network-blocked and no Render API key is present; a secure RENDER_API_KEY requirement is saved for api.render.com.
+- Existing Neon secret was misnamed with a key-like string: user should rotate it and correct the secret name to NEON_API_KEY without sharing values in chat.
