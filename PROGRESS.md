@@ -20,3 +20,11 @@
 - User must create accounts and configure values securely in Render, then deploy and check real upload/playback and persistence after restart.
 - No public URL has been issued or verified. Provider free allowances and billing requirements must be checked by the account owner.
 - Source updates are saved on GitHub main; inspect Git history for the resulting revision.
+
+## Neon CLI setup request
+- User supplied project `mute-silence-39082005`, branch `production`, and an exact private uploads bucket policy.
+- CLI, config/env packages, TypeScript, agent skills and project-scoped OAuth MCP config installed locally.
+- Policy type-check and load pass; 22 Django tests still pass.
+- Login/link/deploy attempts are blocked by the network proxy (HTTP 403); remote project, region and bucket state remain unverified.
+- Required Neon domains are saved in the cloud network draft. Runtime access and Neon login must be completed before deployment can resume.
+- See docs/NEON.md. Django uploads still use the existing R2 configuration; Neon object storage has not been connected.

@@ -6,3 +6,9 @@ media/
 staticfiles/
 .env
 .admin-credentials.txt
+
+node_modules/
+.neon
+.neon-auth/
+.env.*
+!.env.example

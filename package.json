@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "@neon/config": "^1.8.6",
+    "@neon/env": "^1.5.3"
+  },
+  "devDependencies": {
+    "neon": "^8.3.5",
+    "typescript": "^7.0.2"
+  },
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "neon": "neon --config-dir .neon-auth",
+    "check:neon": "tsc --noEmit --module nodenext --moduleResolution nodenext --target ES2022 --skipLibCheck neon.ts"
+  }
+}
