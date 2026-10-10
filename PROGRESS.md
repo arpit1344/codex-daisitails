@@ -1,26 +1,22 @@
 # Project handoff
 
-## Implemented
-- Django 5.2 project with SQLite development database.
-- Categories, draft/published videos, featured flag, video uploads and thumbnail uploads.
-- Django staff admin with filtering, search and bulk publish/unpublish actions.
-- Responsive white/blue video catalog with category sidebar, search, pagination and video detail player.
-- Persistent dark-mode toggle, editorial ratings, quality badges and page-view counts.
-- Latest, featured, top rated and most viewed sorting.
-- All 10 Django workflow tests passed. Chromium browser checks passed for desktop/mobile layout, theme persistence, sorting navigation and search.
+## Current application
+- General-purpose Django video library with categories, drafts, featured videos, upload admin, editorial ratings, view counts and responsive white/blue UI with dark mode.
+- Local SQLite and media files are preserved. Local admin credentials are in ignored `.admin-credentials.txt`.
+- Six local demo videos and real MP4 playback were verified in Chromium.
 
-## Next steps
-- The agreed scope is a general-purpose video library. A screenshot was supplied and used for general layout direction.
-- Local admin account created; generated credentials are in ignored `.admin-credentials.txt`. Create a separate account on a fresh database.
-- Six clearly labelled demo videos and original thumbnails are installed locally. A real MP4 demo was played successfully in Chromium. Replace demo media with your own uploads.
-- Confirm branding and any extra page/settings requirements.
-- Configure production hosting and persistent media storage before launch.
+## Persistent hosting integration
+- Render Free Blueprint now requires Neon PostgreSQL and Cloudflare R2 settings.
+- PostgreSQL enforces certificate/hostname verification and pooler-compatible short-lived connections.
+- Private R2 storage uses one-hour signed URLs, bucket-scoped credentials and no overwriting of existing filenames.
+- 22 Django tests pass, including simulated S3 upload/read/delete, signed URLs, TLS settings and missing-credential failures. Dependency checks also pass.
+- Startup checks database access and temporary storage write/read/delete before migrations/admin bootstrap. Existing admin accounts are preserved.
+- Optional demo seeding uses bundled original assets; it does not migrate existing local content.
+- Setup guide: docs/HOSTING.md. No secrets are committed.
 
-See README.md for setup and cross-machine limitations. Source is ready to commit and push; see Git history for the saved revision.
-
-## Free hosting preparation
-- Render Free Blueprint, Gunicorn and WhiteNoise added.
-- Fresh DEBUG=0 startup, migration, environment-based admin creation, demo seeding, static files and playable media verified locally.
-- 13 Django tests pass, including repeatable hosting bootstrap and demo seeding.
-- Public deployment is pending the user connecting Render/GitHub and securely setting an admin password. No public Render URL has been issued or verified.
-- Free preview uploads and SQLite data are ephemeral.
+## External prerequisites and remaining work
+- User chose Neon PostgreSQL after discussing MongoDB. Render, Neon and Cloudflare accounts still need to be created.
+- No cloud credentials are available in this machine or configuration; actual cloud connectivity is not verified.
+- User must create accounts and configure values securely in Render, then deploy and check real upload/playback and persistence after restart.
+- No public URL has been issued or verified. Provider free allowances and billing requirements must be checked by the account owner.
+- Source updates are saved on GitHub main; inspect Git history for the resulting revision.

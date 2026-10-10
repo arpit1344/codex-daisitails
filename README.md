@@ -30,7 +30,7 @@ Tests cover admin uploads and login restrictions, unsupported extensions, draft 
 
 ## Deployment
 
-This is a development setup, not a deployed production site. Set `DJANGO_DEBUG=0`, a private `DJANGO_SECRET_KEY`, and comma-separated `DJANGO_ALLOWED_HOSTS`. Use a production WSGI server, HTTPS, configured static/media serving and persistent storage with backups. Run `collectstatic` and deployment security checks. Large uploads need server limits and preferably object storage; they currently use Django's local media storage. Do not expose Django's development server as a production service.
+This is a development setup, not a deployed production site. Set `DJANGO_DEBUG=0`, a private `DJANGO_SECRET_KEY`, and comma-separated `DJANGO_ALLOWED_HOSTS`. Use a production WSGI server, HTTPS, configured static/media serving and persistent storage with backups. Run `collectstatic` and deployment security checks. Cloud media uses R2 when configured; local development uses filesystem storage. Large uploads still pass through Django and need appropriate hosting limits. Do not expose Django's development server as a production service.
 
 ## Continue on another computer
 
@@ -42,17 +42,14 @@ Run `.venv/bin/python manage.py seed_demo` to create six clearly labelled demo v
 
 A local admin account was created during development. Its generated password is in the ignored `.admin-credentials.txt` file; change it after first login. Credentials, media and SQLite records are not pushed to GitHub. On a new machine create your own account with `createsuperuser`.
 
-## Free Render preview
+## Persistent hosting
 
-Deployment entry: https://render.com/deploy?repo=https://github.com/arpit1344/codex-daisitails
+The default Render Blueprint now uses **Neon PostgreSQL** for records and **Cloudflare R2** for private videos/thumbnails. Render runs Django with Gunicorn and WhiteNoise. See [the complete account and deployment guide](docs/HOSTING.md).
 
-1. Sign in to Render and connect GitHub. Grant access to this repository if it is private.
-2. Deploy the Blueprint from `render.yaml`; keep the service on the **Free** plan.
-3. Enter a strong `DJANGO_SUPERUSER_PASSWORD` securely in Render settings when prompted. The username is `admin`. Do not reuse or publish the local development password.
-4. Deploy and wait for the service to become Live. Open the URL Render supplies; admin is at `/admin/`.
+Deploy entry: https://render.com/deploy?repo=https://github.com/arpit1344/codex-daisitails
 
-The Blueprint generates a Django secret, disables debug, collects static assets and starts Gunicorn. Startup migrates SQLite, creates an admin if missing, and seeds six demo videos. Startup never overwrites an existing account. HTTPS is provided by Render, with Django trusting Render's forwarded-protocol header. Health check: `/health/`.
+Set `DATABASE_URL`, all four `R2_*` variables and a new admin password in Render's secure environment settings. Do not share credentials in chat. Persistent mode refuses to start if database/storage settings are missing. It verifies PostgreSQL TLS certificates and hostnames and uses expiring signed R2 media URLs.
 
-**Free preview storage is ephemeral.** SQLite records, accounts and uploaded media can be lost when the service is restarted, redeployed or replaced. Demo content is recreated on startup; real uploads are not backed up. This is a demo deployment, not a permanent video hosting system. Free services may sleep when idle, so the first request can be slow. Check Render's current plan limits in its dashboard before confirming deployment.
+`bash scripts/start.sh` checks database connectivity and a temporary media write/read/delete before running migrations and bootstrapping the admin. Demo data is optional through `SEED_DEMO=1`; no local content is migrated automatically. `scripts/start-preview.sh` remains available for a disposable SQLite/local-media demo, with the limitations described in the hosting guide.
 
-Media is served by Django only when `DJANGO_PREVIEW_MODE=1`; configure persistent database/object storage and disable preview media serving for a permanent site. HSTS subdomain/preload checks remain intentionally unconfigured until you control the final domain and its HTTPS policy.
+External accounts have not yet been created: live Neon/R2 access, persistent uploads across a Render restart and a public URL remain unverified. Local development still works with SQLite and filesystem storage when persistent mode is not selected.
