@@ -4,9 +4,11 @@
 - General-purpose Django video library with categories, drafts, featured videos, upload admin, editorial ratings, view counts and responsive white/blue UI with dark mode.
 - Local SQLite and media files are preserved. Local admin credentials are in ignored `.admin-credentials.txt`.
 - Six local demo videos and real MP4 playback were verified in Chromium.
+- Live site: https://video-tales.onrender.com/videos/
+- Live admin: https://video-tales.onrender.com/admin/
 
 ## Persistent hosting integration
-- Render Free Blueprint now requires Neon PostgreSQL and Cloudflare R2 settings.
+- Render Free hosts Django; Neon provides PostgreSQL and private object storage.
 - PostgreSQL enforces certificate/hostname verification and pooler-compatible short-lived connections.
 - Private R2 storage uses one-hour signed URLs, bucket-scoped credentials and no overwriting of existing filenames.
 - 22 Django tests pass, including simulated S3 upload/read/delete, signed URLs, TLS settings and missing-credential failures. Dependency checks also pass.
@@ -14,12 +16,13 @@
 - Optional demo seeding uses bundled original assets; it does not migrate existing local content.
 - Setup guide: docs/HOSTING.md. No secrets are committed.
 
-## External prerequisites and remaining work
-- User chose Neon PostgreSQL after discussing MongoDB. Render, Neon and Cloudflare accounts still need to be created.
-- No cloud credentials are available in this machine or configuration; actual cloud connectivity is not verified.
-- User must create accounts and configure values securely in Render, then deploy and check real upload/playback and persistence after restart.
-- No public URL has been issued or verified. Provider free allowances and billing requirements must be checked by the account owner.
-- Source updates are saved on GitHub main; inspect Git history for the resulting revision.
+## Live deployment verification
+- Render service `video-tales` is deployed from GitHub `main` on the free plan.
+- Render's `/health/` deployment check passed on the initial deploy and again after a clean restart with demo seeding disabled.
+- The restart reused the existing Neon PostgreSQL database and private `uploads` bucket.
+- Required Render secrets are configured in the service and are not committed to Git.
+- Live admin credentials are stored only in ignored `.render-admin-credentials.txt`.
+- Render free services may sleep when idle; the first request after inactivity can take longer.
 
 ## Neon CLI setup request
 - User supplied project `mute-silence-39082005`, branch `production`, and an exact private uploads bucket policy.
@@ -43,8 +46,7 @@
 - Render API remains network-blocked and no Render API key is present; a secure RENDER_API_KEY requirement is saved for api.render.com.
 - Existing Neon secret was misnamed with a key-like string: user should rotate it and correct the secret name to NEON_API_KEY without sharing values in chat.
 
-## Render deployment continuation
-- `RENDER_API_KEY` is injected and authenticated; the account currently has no services.
-- Django now accepts Neon Object Storage's standard `AWS_*` variables, replacing the separate R2 requirement.
-- Live Neon runtime variables were retrieved to an ignored temporary file without printing values. Actual database/storage connectivity from this machine remains blocked until the newly saved dynamic Neon hostnames are applied to the environment network policy.
-- The Render Blueprint no longer prompts the user for secret values. It can create the service first; the authorized deployment flow will then set secrets through Render's API.
+## Render deployment completion
+- Django uses Neon Object Storage's standard `AWS_*` variables.
+- The Blueprint service was created, all runtime secrets were set through Render's API, migrations and admin bootstrap completed, and demo content was seeded once.
+- `SEED_DEMO` is now disabled in Render and in `render.yaml`; a second deployment reached `live`, confirming repeatable startup against persistent services.

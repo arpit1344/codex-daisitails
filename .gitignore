@@ -6,6 +6,7 @@ media/
 staticfiles/
 .env
 .admin-credentials.txt
+.render-admin-credentials.txt
 
 node_modules/
 .neon
