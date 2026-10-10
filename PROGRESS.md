@@ -17,3 +17,10 @@
 - Configure production hosting and persistent media storage before launch.
 
 See README.md for setup and cross-machine limitations. Source is ready to commit and push; see Git history for the saved revision.
+
+## Free hosting preparation
+- Render Free Blueprint, Gunicorn and WhiteNoise added.
+- Fresh DEBUG=0 startup, migration, environment-based admin creation, demo seeding, static files and playable media verified locally.
+- 13 Django tests pass, including repeatable hosting bootstrap and demo seeding.
+- Public deployment is pending the user connecting Render/GitHub and securely setting an admin password. No public Render URL has been issued or verified.
+- Free preview uploads and SQLite data are ephemeral.

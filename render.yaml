@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: video-tales-preview
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    startCommand: bash scripts/start-preview.sh
+    healthCheckPath: /health/
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.14
+      - key: DJANGO_DEBUG
+        value: '0'
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_ALLOWED_HOSTS
+        value: .onrender.com,localhost,127.0.0.1
+      - key: DJANGO_PREVIEW_MODE
+        value: '1'
+      - key: DJANGO_SUPERUSER_USERNAME
+        value: admin
+      - key: DJANGO_SUPERUSER_PASSWORD
+        sync: false

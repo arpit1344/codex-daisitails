@@ -83,3 +83,32 @@ class VideoWorkflowTests(TestCase):
         self.video.editor_rating = 101
         with self.assertRaises(ValidationError):
             self.video.full_clean()
+
+class HostingBootstrapTests(TestCase):
+    def test_admin_creation_and_repeatability(self):
+        from unittest.mock import patch
+        from django.core.management import call_command
+        import secrets
+        password = secrets.token_urlsafe(24)
+        with patch.dict('os.environ', {'DJANGO_SUPERUSER_USERNAME': 'host-admin', 'DJANGO_SUPERUSER_PASSWORD': password}):
+            call_command('bootstrap_admin', verbosity=0)
+            call_command('bootstrap_admin', verbosity=0)
+        user = get_user_model().objects.get(username='host-admin')
+        self.assertTrue(user.is_superuser)
+        self.assertTrue(user.check_password(password))
+        self.assertEqual(get_user_model().objects.filter(username='host-admin').count(), 1)
+
+    def test_admin_missing_password_is_explicit_error(self):
+        from unittest.mock import patch
+        from django.core.management import call_command, CommandError
+        with patch.dict('os.environ', {'DJANGO_SUPERUSER_USERNAME': 'host-admin', 'DJANGO_SUPERUSER_PASSWORD': ''}):
+            with self.assertRaises(CommandError):
+                call_command('bootstrap_admin')
+
+    def test_demo_seed_is_repeatable_without_external_encoder(self):
+        from django.core.management import call_command
+        with tempfile.TemporaryDirectory() as storage, override_settings(MEDIA_ROOT=storage):
+            call_command('seed_demo', verbosity=0)
+            call_command('seed_demo', verbosity=0)
+            self.assertEqual(Video.objects.count(), 6)
+            self.assertTrue(all(v.file.storage.exists(v.file.name) for v in Video.objects.all()))

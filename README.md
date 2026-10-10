@@ -26,7 +26,7 @@ Supported upload extensions: MP4, WebM and OGV. For broad browser compatibility,
 .venv/bin/python manage.py test
 ```
 
-Tests cover admin uploads and login restrictions, unsupported extensions, draft privacy, search/category filters, detail player markup, pagination, sorting, rating limits, category counts and view counting. Upload tests use synthetic bytes and do not prove browser codec playback.
+Tests cover admin uploads and login restrictions, unsupported extensions, draft privacy, search/category filters, detail player markup, pagination, sorting, rating limits, category counts and view counting. Upload tests use synthetic bytes. The bundled MP4 demo playback was separately verified in Chromium, including the Render-style DEBUG=0 Gunicorn runtime.
 
 ## Deployment
 
@@ -38,6 +38,21 @@ Commit and push source changes, then pull the same branch on the other machine. 
 
 ## Demo collection and local admin
 
-Run `.venv/bin/python manage.py seed_demo` to create six clearly labelled demo videos with original illustrated thumbnails and a playable three-second test-pattern clip. This optional command requires `ffmpeg` and skips existing demo slugs. The demo collection is for preview; replace it with your own media in admin. It does not change existing content.
+Run `.venv/bin/python manage.py seed_demo` to create six clearly labelled demo videos with original illustrated thumbnails and a playable three-second test-pattern clip. This optional command uses a bundled demo clip and skips existing demo slugs. The demo collection is for preview; replace it with your own media in admin. It does not change existing content.
 
 A local admin account was created during development. Its generated password is in the ignored `.admin-credentials.txt` file; change it after first login. Credentials, media and SQLite records are not pushed to GitHub. On a new machine create your own account with `createsuperuser`.
+
+## Free Render preview
+
+Deployment entry: https://render.com/deploy?repo=https://github.com/arpit1344/codex-daisitails
+
+1. Sign in to Render and connect GitHub. Grant access to this repository if it is private.
+2. Deploy the Blueprint from `render.yaml`; keep the service on the **Free** plan.
+3. Enter a strong `DJANGO_SUPERUSER_PASSWORD` securely in Render settings when prompted. The username is `admin`. Do not reuse or publish the local development password.
+4. Deploy and wait for the service to become Live. Open the URL Render supplies; admin is at `/admin/`.
+
+The Blueprint generates a Django secret, disables debug, collects static assets and starts Gunicorn. Startup migrates SQLite, creates an admin if missing, and seeds six demo videos. Startup never overwrites an existing account. HTTPS is provided by Render, with Django trusting Render's forwarded-protocol header. Health check: `/health/`.
+
+**Free preview storage is ephemeral.** SQLite records, accounts and uploaded media can be lost when the service is restarted, redeployed or replaced. Demo content is recreated on startup; real uploads are not backed up. This is a demo deployment, not a permanent video hosting system. Free services may sleep when idle, so the first request can be slow. Check Render's current plan limits in its dashboard before confirming deployment.
+
+Media is served by Django only when `DJANGO_PREVIEW_MODE=1`; configure persistent database/object storage and disable preview media serving for a permanent site. HSTS subdomain/preload checks remain intentionally unconfigured until you control the final domain and its HTTPS policy.

@@ -1,21 +1,15 @@
 """Create six clearly labelled demo entries with original artwork and a playable clip."""
 import io
-import shutil
-import subprocess
-import tempfile
 from pathlib import Path
 from django.core.files.base import ContentFile
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from PIL import Image, ImageDraw
 from videos.models import Category, Video
 
 class Command(BaseCommand):
-    help = 'Create general-purpose demo videos. Requires ffmpeg; skips existing demo slugs.'
+    help = 'Create general-purpose demo videos; skips existing demo slugs.'
 
     def handle(self, *args, **options):
-        ffmpeg = shutil.which('ffmpeg')
-        if not ffmpeg:
-            raise CommandError('Install ffmpeg before running seed_demo.')
         scenes = [
             ('A quiet morning in the mountains', 'Travel', (48, 99, 131), (244, 189, 125)),
             ('Small ideas, beautiful spaces', 'Lifestyle', (105, 123, 98), (229, 225, 186)),
@@ -24,10 +18,7 @@ class Command(BaseCommand):
             ('A little adventure goes a long way', 'Travel', (60, 88, 133), (183, 204, 239)),
             ('Make time for what you love', 'Lifestyle', (168, 94, 64), (251, 210, 153)),
         ]
-        with tempfile.TemporaryDirectory() as temp:
-            clip = Path(temp) / 'demo.mp4'
-            subprocess.run([ffmpeg, '-hide_banner', '-loglevel', 'error', '-f', 'lavfi', '-i', 'testsrc2=size=640x360:rate=24', '-t', '3', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', str(clip)], check=True)
-            clip_bytes = clip.read_bytes()
+        clip_bytes = (Path(__file__).resolve().parents[2] / 'demo_assets' / 'preview.mp4').read_bytes()
         for index, (title, name, lower, upper) in enumerate(scenes):
             slug = f'demo-video-{index+1}'
             if Video.objects.filter(slug=slug).exists():
