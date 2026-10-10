@@ -21,17 +21,9 @@ services:
         value: '1'
       - key: SEED_DEMO
         value: '0'
-      - key: DATABASE_URL
-        sync: false
-      - key: R2_ENDPOINT_URL
-        sync: false
-      - key: R2_BUCKET_NAME
-        sync: false
-      - key: R2_ACCESS_KEY_ID
-        sync: false
-      - key: R2_SECRET_ACCESS_KEY
-        sync: false
+      - key: AWS_STORAGE_BUCKET_NAME
+        value: uploads
+      - key: AWS_REGION
+        value: us-east-2
       - key: DJANGO_SUPERUSER_USERNAME
         value: admin
-      - key: DJANGO_SUPERUSER_PASSWORD
-        sync: false

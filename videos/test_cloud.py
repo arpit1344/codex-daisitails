@@ -38,23 +38,23 @@ class CloudConfigurationTests(SimpleTestCase):
                 database_config(Path('/tmp'), False)
             self.assertNotIn('private-test-value', str(error.exception))
 
-    def test_partial_r2_config_fails(self):
-        with patch.dict(os.environ, {'R2_BUCKET_NAME': 'test-only'}, clear=True):
+    def test_partial_storage_config_fails(self):
+        with patch.dict(os.environ, {'AWS_STORAGE_BUCKET_NAME': 'test-only'}, clear=True):
             with self.assertRaises(ImproperlyConfigured):
                 media_storage_config()
 
-    def r2_environment(self):
-        return {'R2_ENDPOINT_URL': 'https://test-account.r2.cloudflarestorage.com', 'R2_BUCKET_NAME': 'test-only', 'R2_ACCESS_KEY_ID': 'test-only', 'R2_SECRET_ACCESS_KEY': 'test-only'}
+    def storage_environment(self):
+        return {'AWS_ENDPOINT_URL_S3': 'https://storage.example.neon.tech', 'AWS_STORAGE_BUCKET_NAME': 'test-only', 'AWS_ACCESS_KEY_ID': 'test-only', 'AWS_SECRET_ACCESS_KEY': 'test-only', 'AWS_REGION': 'us-east-2'}
 
-    def test_r2_requires_https_endpoint(self):
-        env = self.r2_environment()
-        env['R2_ENDPOINT_URL'] = 'http://test-account.r2.cloudflarestorage.com'
+    def test_storage_requires_https_endpoint(self):
+        env = self.storage_environment()
+        env['AWS_ENDPOINT_URL_S3'] = 'http://storage.example.neon.tech'
         with patch.dict(os.environ, env, clear=True):
             with self.assertRaises(ImproperlyConfigured):
                 media_storage_config()
 
-    def test_private_signed_r2_upload_read_delete_contract(self):
-        with patch.dict(os.environ, self.r2_environment(), clear=True):
+    def test_private_signed_storage_upload_read_delete_contract(self):
+        with patch.dict(os.environ, self.storage_environment(), clear=True):
             storage = S3Storage(**media_storage_config()['OPTIONS'])
             client = storage.connection.meta.client
             data = b'cloud-media-check'
@@ -63,7 +63,7 @@ class CloudConfigurationTests(SimpleTestCase):
                 stub.add_response('put_object', {}, {'Bucket':'test-only','Key':'video-tales/probe.txt','Body':ANY,'ContentType':'text/plain'})
                 name = storage.save('probe.txt', ContentFile(data))
                 url = storage.url(name)
-                self.assertTrue(url.startswith('https://test-account.r2.cloudflarestorage.com/'))
+                self.assertTrue(url.startswith('https://storage.example.neon.tech/'))
                 self.assertIn('X-Amz-Signature=', url)
                 self.assertIn('X-Amz-Expires=3600', url)
                 stub.add_response('head_object', {'ContentLength':len(data)}, {'Bucket':'test-only','Key':'video-tales/probe.txt'})

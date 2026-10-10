@@ -1,4 +1,6 @@
-# Render + Neon + Cloudflare R2 setup
+# Render + Neon database and object storage setup
+
+> Current architecture: both PostgreSQL and the private `uploads` bucket are provided by Neon. The older Cloudflare R2 instructions later in this document are retained only as migration history and should not be followed for the current deployment. Render receives `DATABASE_URL`, `AWS_ENDPOINT_URL_S3`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, and `AWS_STORAGE_BUCKET_NAME=uploads` through its secure environment API.
 
 The application integration is prepared. The external accounts and services have not been created or verified. Account creation, billing selection and credentials must be handled by the account owner. Never send secret values in chat or commit them to GitHub.
 

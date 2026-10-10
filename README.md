@@ -44,11 +44,11 @@ A local admin account was created during development. Its generated password is 
 
 ## Persistent hosting
 
-The default Render Blueprint now uses **Neon PostgreSQL** for records and **Cloudflare R2** for private videos/thumbnails. Render runs Django with Gunicorn and WhiteNoise. See [the complete account and deployment guide](docs/HOSTING.md).
+The default Render Blueprint uses **Neon PostgreSQL** for records and **Neon Object Storage** for private videos/thumbnails. Render runs Django with Gunicorn and WhiteNoise. See [the complete account and deployment guide](docs/HOSTING.md).
 
 Deploy entry: https://render.com/deploy?repo=https://github.com/arpit1344/codex-daisitails
 
-Set `DATABASE_URL`, all four `R2_*` variables and a new admin password in Render's secure environment settings. Do not share credentials in chat. Persistent mode refuses to start if database/storage settings are missing. It verifies PostgreSQL TLS certificates and hostnames and uses expiring signed R2 media URLs.
+Set `DATABASE_URL`, Neon’s `AWS_*` object-storage variables and a new admin password in Render's secure environment settings. Do not share credentials in chat. Persistent mode refuses to start if database/storage settings are missing. It verifies PostgreSQL TLS certificates and hostnames and uses expiring signed media URLs.
 
 `bash scripts/start.sh` checks database connectivity and a temporary media write/read/delete before running migrations and bootstrapping the admin. Demo data is optional through `SEED_DEMO=1`; no local content is migrated automatically. `scripts/start-preview.sh` remains available for a disposable SQLite/local-media demo, with the limitations described in the hosting guide.
 

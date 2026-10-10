@@ -42,3 +42,9 @@
 - No connection strings or storage secrets were retrieved. Public website hosting and app-to-Neon-storage integration remain pending.
 - Render API remains network-blocked and no Render API key is present; a secure RENDER_API_KEY requirement is saved for api.render.com.
 - Existing Neon secret was misnamed with a key-like string: user should rotate it and correct the secret name to NEON_API_KEY without sharing values in chat.
+
+## Render deployment continuation
+- `RENDER_API_KEY` is injected and authenticated; the account currently has no services.
+- Django now accepts Neon Object Storage's standard `AWS_*` variables, replacing the separate R2 requirement.
+- Live Neon runtime variables were retrieved to an ignored temporary file without printing values. Actual database/storage connectivity from this machine remains blocked until the newly saved dynamic Neon hostnames are applied to the environment network policy.
+- The Render Blueprint no longer prompts the user for secret values. It can create the service first; the authorized deployment flow will then set secrets through Render's API.

@@ -29,5 +29,5 @@ class Command(BaseCommand):
                     default_storage.delete(stored_name)
                 except Exception:
                     pass
-            raise CommandError('Cloud connectivity check failed. Verify database access/TLS and R2 bucket permissions in hosting settings.') from None
+            raise CommandError('Cloud connectivity check failed. Verify database access/TLS and Neon bucket permissions in hosting settings.') from None
         self.stdout.write(self.style.SUCCESS('Database and configured media storage checks passed.'))

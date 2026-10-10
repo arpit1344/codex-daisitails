@@ -31,26 +31,26 @@ def database_config(base_dir, debug):
 
 def media_storage_config():
     required = os.environ.get('DJANGO_PERSISTENT_MODE', '0') == '1'
-    names = ['R2_ENDPOINT_URL', 'R2_BUCKET_NAME', 'R2_ACCESS_KEY_ID', 'R2_SECRET_ACCESS_KEY']
+    names = ['AWS_ENDPOINT_URL_S3', 'AWS_STORAGE_BUCKET_NAME', 'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']
     present = [bool(os.environ.get(name)) for name in names]
     if not any(present) and not required:
         return {'BACKEND': 'django.core.files.storage.FileSystemStorage'}
     if not all(present):
-        raise ImproperlyConfigured('Set all four R2 storage variables: endpoint, bucket, access key and secret key.')
-    endpoint = os.environ['R2_ENDPOINT_URL'].rstrip('/')
+        raise ImproperlyConfigured('Set all four Neon storage variables: endpoint, bucket, access key and secret key.')
+    endpoint = os.environ['AWS_ENDPOINT_URL_S3'].rstrip('/')
     try:
         parsed = urlsplit(endpoint)
-        valid = (parsed.scheme == 'https' and parsed.hostname and parsed.hostname.endswith('.r2.cloudflarestorage.com') and not parsed.username and not parsed.password and not parsed.port and parsed.path in ('', '/') and not parsed.query and not parsed.fragment)
+        valid = (parsed.scheme == 'https' and parsed.hostname and not parsed.username and not parsed.password and not parsed.port and parsed.path in ('', '/') and not parsed.query and not parsed.fragment)
     except ValueError:
         valid = False
     if not valid:
-        raise ImproperlyConfigured('R2_ENDPOINT_URL must be the HTTPS S3 endpoint supplied by Cloudflare.')
+        raise ImproperlyConfigured('AWS_ENDPOINT_URL_S3 must be the HTTPS S3 endpoint supplied by Neon.')
     return {'BACKEND': 'storages.backends.s3.S3Storage', 'OPTIONS': {
-        'access_key': os.environ['R2_ACCESS_KEY_ID'],
-        'secret_key': os.environ['R2_SECRET_ACCESS_KEY'],
-        'bucket_name': os.environ['R2_BUCKET_NAME'],
+        'access_key': os.environ['AWS_ACCESS_KEY_ID'],
+        'secret_key': os.environ['AWS_SECRET_ACCESS_KEY'],
+        'bucket_name': os.environ['AWS_STORAGE_BUCKET_NAME'],
         'endpoint_url': endpoint,
-        'region_name': 'auto',
+        'region_name': os.environ.get('AWS_REGION', 'us-east-2'),
         'default_acl': None,
         'file_overwrite': False,
         'location': 'video-tales',
