@@ -101,6 +101,30 @@ class VideoWorkflowTests(TestCase):
         response = self.client.get(reverse('video_list'))
         self.assertEqual(response.context['categories'][0].published_count, 1)
 
+    def test_video_page_has_canonical_social_and_structured_metadata(self):
+        self.video.description = 'A scenic mountain journey.'
+        self.video.seo_title = 'Mountain Journey Video'
+        self.video.save()
+        response = self.client.get(self.video.get_absolute_url())
+        self.assertContains(response, '<link rel="canonical" href="http://testserver/videos/mountain-journey/">')
+        self.assertContains(response, '<meta property="og:type" content="video.other">')
+        self.assertContains(response, '<meta property="og:title" content="Mountain Journey Video">')
+        self.assertContains(response, 'application/ld+json')
+        self.assertContains(response, 'VideoObject')
+
+    def test_filtered_pages_are_noindex_with_catalog_canonical(self):
+        response = self.client.get(reverse('video_list'), {'q': 'Mountain'})
+        self.assertContains(response, '<meta name="robots" content="noindex,follow">')
+        self.assertContains(response, '<link rel="canonical" href="http://testserver/videos/">')
+
+    def test_sitemap_and_robots_only_advertise_public_content(self):
+        sitemap = self.client.get('/sitemap.xml')
+        self.assertContains(sitemap, 'http://testserver/videos/mountain-journey/')
+        self.assertNotContains(sitemap, 'hidden-draft')
+        robots = self.client.get('/robots.txt')
+        self.assertContains(robots, 'Disallow: /admin/')
+        self.assertContains(robots, 'Sitemap: http://testserver/sitemap.xml')
+
     def test_editor_rating_rejects_over_100(self):
         from django.core.exceptions import ValidationError
         self.video.editor_rating = 101

@@ -4,6 +4,7 @@
 - General-purpose Django video library with categories, drafts, featured videos, upload admin, editorial ratings, view counts and responsive white/blue UI with dark mode.
 - Catalog discovery includes search, category/language/duration filters, latest/popular/top-rated sorting and filter-preserving pagination.
 - New thumbnails are resized within 1280×720 and stored as compressed WebP; cards use lazy decoding, stable 16:9 artwork and clear duration badges.
+- SEO includes admin-editable titles/descriptions, canonical URLs, social preview tags, VideoObject structured data, a public-content-only sitemap and robots rules that keep admin pages out of search results.
 - Local SQLite and media files are preserved. Local admin credentials are in ignored `.admin-credentials.txt`.
 - Six local demo videos and real MP4 playback were verified in Chromium.
 - Live site: https://video-tales.onrender.com/videos/

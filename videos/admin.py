@@ -15,6 +15,12 @@ class VideoAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
     list_editable = ['is_published', 'is_featured']
     readonly_fields = ['created_at', 'views', 'duration_seconds']
+    fieldsets = [
+        (None, {'fields': ('title', 'slug', 'description', 'category', 'language')}),
+        ('Media', {'fields': ('file', 'thumbnail', 'duration', 'duration_seconds', 'quality')}),
+        ('Search and sharing', {'fields': ('seo_title', 'seo_description'), 'description': 'Optional text for Google, WhatsApp and social previews.'}),
+        ('Publishing', {'fields': ('is_published', 'is_featured', 'editor_rating', 'views', 'created_at')}),
+    ]
     actions = ['publish', 'unpublish']
     @admin.action(description='Publish selected videos')
     def publish(self, request, queryset):

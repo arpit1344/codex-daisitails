@@ -1,3 +1,19 @@
 {% load static %}<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{% block title %}Video Library{% endblock %}</title><link rel="stylesheet" href="{% static 'videos/style.css' %}"><link rel="stylesheet" href="{% static 'videos/catalog.css' %}"><script src="{% static 'videos/theme.js' %}" defer></script></head>
+<html lang="en"><head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{% block title %}Video Tales · Discover videos worth watching{% endblock %}</title>
+  <meta name="description" content="{{ meta_description|default:'Discover videos worth watching on Video Tales.' }}">
+  <meta name="robots" content="{% if noindex %}noindex,follow{% else %}index,follow,max-image-preview:large,max-video-preview:-1{% endif %}">
+  {% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}">{% endif %}
+  <meta property="og:site_name" content="Video Tales"><meta property="og:type" content="{% block og_type %}website{% endblock %}">
+  <meta property="og:title" content="{% block social_title %}Video Tales · Discover videos worth watching{% endblock %}">
+  <meta property="og:description" content="{{ meta_description|default:'Discover videos worth watching on Video Tales.' }}">
+  {% if canonical_url %}<meta property="og:url" content="{{ canonical_url }}">{% endif %}
+  {% if social_image %}<meta property="og:image" content="{{ social_image }}"><meta property="og:image:alt" content="{% block image_alt %}Video thumbnail{% endblock %}">{% endif %}
+  <meta name="twitter:card" content="{% if social_image %}summary_large_image{% else %}summary{% endif %}">
+  <meta name="twitter:title" content="{% block twitter_title %}Video Tales · Discover videos worth watching{% endblock %}">
+  <meta name="twitter:description" content="{{ meta_description|default:'Discover videos worth watching on Video Tales.' }}">
+  {% if structured_data %}<script type="application/ld+json">{{ structured_data|safe }}</script>{% endif %}
+  <link rel="stylesheet" href="{% static 'videos/style.css' %}"><link rel="stylesheet" href="{% static 'videos/catalog.css' %}"><script src="{% static 'videos/theme.js' %}" defer></script>
+</head>
 <body><div class="utility"><div class="shell utility-inner"><span>Discover something worth watching</span><div><button id="theme-toggle" type="button" aria-pressed="false">☾ Dark</button><a href="{% url 'admin:index' %}">{% if user.is_staff %}Admin panel{% else %}Admin login{% endif %}</a></div></div></div><header class="shell masthead"><a class="brand" href="{% url 'video_list' %}">Video Tales <span aria-hidden="true">❧</span></a><form class="header-search" action="{% url 'video_list' %}" method="get"><label class="sr-only" for="site-search">Search videos</label><input id="site-search" name="q" value="{{ query }}" placeholder="Search videos"><button aria-label="Search" type="submit"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><circle cx="10" cy="10" r="6" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="m15 15 6 6" stroke="currentColor" stroke-width="2.5"/></svg></button></form></header><div class="nav-border"><nav class="shell main-nav" aria-label="Main navigation"><a href="{% url 'video_list' %}" aria-label="All videos" class="home-link">⌂</a><a href="{% url 'video_list' %}?sort=featured" {% if sort == 'featured' %}class="active"{% endif %}>Featured</a><a href="{% url 'video_list' %}?sort=latest" {% if sort == 'latest' %}class="active"{% endif %}>Latest</a><a href="{% url 'video_list' %}?sort=top" {% if sort == 'top' %}class="active"{% endif %}>Top rated</a><a href="{% url 'video_list' %}?sort=views" {% if sort == 'views' %}class="active"{% endif %}>Most viewed</a><a href="{% url 'video_list' %}#categories">Categories</a></nav></div><main class="shell">{% block content %}{% endblock %}</main><footer><div class="shell">Video Tales <span>Discover. Watch. Enjoy.</span></div></footer></body></html>

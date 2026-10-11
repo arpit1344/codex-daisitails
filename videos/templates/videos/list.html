@@ -1,4 +1,5 @@
 {% extends 'videos/base.html' %}
+{% block title %}{% if query %}Search results for {{ query }}{% elif sort == 'views' %}Most Popular Videos{% elif sort == 'top' %}Top Rated Videos{% elif sort == 'featured' %}Featured Videos{% else %}Latest Videos{% endif %} · Video Tales{% endblock %}
 {% block content %}
 <div class="page-heading">
   <div><p class="eyebrow">Browse the collection</p><h1>{% if query %}Search results for “{{ query }}”{% elif sort == 'top' %}Top Rated Videos{% elif sort == 'views' %}Most Viewed Videos{% elif sort == 'featured' %}Featured Videos{% else %}Latest Videos{% endif %}</h1></div>

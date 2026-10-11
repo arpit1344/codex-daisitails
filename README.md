@@ -15,6 +15,8 @@ python -m venv .venv
 
 Public routes: `/videos/` and `/videos/<slug>/`. Administration: `/admin/`.
 
+SEO endpoints: `/sitemap.xml` and `/robots.txt`. Public video pages include canonical URLs, Open Graph/Twitter preview metadata and Schema.org `VideoObject` JSON-LD. Filtered/search result URLs are marked `noindex,follow` to avoid duplicate search pages. Editors can override each video's search title and description in the admin panel.
+
 In admin, create categories and upload videos with a language, optional thumbnail, description and duration. Videos are private drafts until **is published** is selected. Set **is featured** to promote a video in featured sorting. Optional quality badges support HD, 2K and 4K. Admin editors assign an editorial score (0–100); it is not a user vote. Top rated sorting uses this score. Most viewed sorting uses video detail page GET visits, including repeat visits; it does not measure completed playback or unique viewers. Filters and pagination only expose published videos.
 
 Supported upload extensions: MP4, WebM and OGV. For broad browser compatibility, upload MP4 encoded with H.264 video and AAC audio. Uploaded thumbnails are resized within 1280×720 and compressed to WebP. Videos are not automatically transcoded and thumbnails are not extracted from video files. File extension validation does not inspect codecs or file content; upload access is restricted to trusted staff.

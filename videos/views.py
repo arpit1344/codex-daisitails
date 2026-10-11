@@ -1,6 +1,9 @@
+import json
+
 from django.core.paginator import Paginator
 from django.db.models import Q, Count, F
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from .models import Category, Video
 
 def home(request):
@@ -41,7 +44,8 @@ def video_list(request):
     page = Paginator(videos, 12).get_page(request.GET.get('page'))
     params = request.GET.copy()
     params.pop('page', None)
-    return render(request, 'videos/list.html', {'page': page, 'categories': Category.objects.annotate(published_count=Count('videos', filter=Q(videos__is_published=True))), 'languages': Video.LANGUAGE_CHOICES, 'query': query, 'selected_category': category, 'selected_language': language, 'selected_duration': duration, 'sort': sort, 'pagination_query': params.urlencode()})
+    canonical_url = request.build_absolute_uri(reverse('video_list'))
+    return render(request, 'videos/list.html', {'page': page, 'categories': Category.objects.annotate(published_count=Count('videos', filter=Q(videos__is_published=True))), 'languages': Video.LANGUAGE_CHOICES, 'query': query, 'selected_category': category, 'selected_language': language, 'selected_duration': duration, 'sort': sort, 'pagination_query': params.urlencode(), 'canonical_url': canonical_url, 'meta_description': 'Discover the latest, popular and top-rated videos on Video Tales. Search by category, language and duration.', 'noindex': bool(request.GET)})
 
 def video_detail(request, slug):
     video = get_object_or_404(Video.objects.select_related('category'), slug=slug, is_published=True)
@@ -49,4 +53,18 @@ def video_detail(request, slug):
         Video.objects.filter(pk=video.pk).update(views=F('views') + 1)
         video.refresh_from_db(fields=['views'])
     related = Video.objects.filter(is_published=True, category=video.category).exclude(pk=video.pk)[:4]
-    return render(request, 'videos/detail.html', {'video': video, 'related': related})
+    canonical_url = request.build_absolute_uri(video.get_absolute_url())
+    image_url = request.build_absolute_uri(video.thumbnail.url) if video.thumbnail else ''
+    content_url = request.build_absolute_uri(video.file.url)
+    structured_data = {
+        '@context': 'https://schema.org', '@type': 'VideoObject',
+        'name': video.meta_title, 'description': video.meta_description,
+        'uploadDate': video.created_at.isoformat(), 'contentUrl': content_url,
+        'url': canonical_url, 'inLanguage': video.language,
+    }
+    if image_url:
+        structured_data['thumbnailUrl'] = [image_url]
+    if video.duration_seconds:
+        structured_data['duration'] = f'PT{video.duration_seconds}S'
+    structured_json = json.dumps(structured_data, ensure_ascii=False).replace('<', '\\u003c')
+    return render(request, 'videos/detail.html', {'video': video, 'related': related, 'canonical_url': canonical_url, 'meta_description': video.meta_description, 'social_image': image_url, 'structured_data': structured_json})

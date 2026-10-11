@@ -26,6 +26,8 @@ class Video(models.Model):
     title = models.CharField(max_length=200)
     slug = models.SlugField(unique=True, max_length=220)
     description = models.TextField(blank=True)
+    seo_title = models.CharField(max_length=60, blank=True, help_text='Optional search result title. Leave blank to use the video title.')
+    seo_description = models.CharField(max_length=160, blank=True, help_text='Optional search result description. Leave blank to use the video description.')
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='videos')
     file = models.FileField(upload_to='videos/%Y/%m/', validators=[FileExtensionValidator(['mp4', 'webm', 'ogv'])], help_text='Upload MP4, WebM or OGV. MP4 with H.264/AAC is recommended.')
     thumbnail = models.ImageField(upload_to='thumbnails/%Y/%m/', blank=True)
@@ -44,6 +46,15 @@ class Video(models.Model):
         return self.title
     def get_absolute_url(self):
         return reverse('video_detail', args=[self.slug])
+
+    @property
+    def meta_title(self):
+        return self.seo_title or self.title
+
+    @property
+    def meta_description(self):
+        text = self.seo_description or self.description or f'Watch {self.title} on Video Tales.'
+        return text[:160]
 
     @staticmethod
     def parse_duration(value):
