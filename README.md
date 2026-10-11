@@ -1,6 +1,6 @@
 # Django Video Library
 
-A Django video website with a staff-only content management panel. The general-purpose layout uses a white theme, blue navigation, a category sidebar and a three-column video grid, with a responsive mobile layout and persistent dark-mode toggle.
+A Django video website with a staff-only content management panel. The responsive catalog includes search, category/language/duration filters, latest/popular/top-rated sorting, pagination and a persistent dark-mode toggle.
 
 ## Local setup
 
@@ -15,9 +15,9 @@ python -m venv .venv
 
 Public routes: `/videos/` and `/videos/<slug>/`. Administration: `/admin/`.
 
-In admin, create categories and upload videos with optional thumbnails, descriptions and durations. Videos are private drafts until **is published** is selected. Set **is featured** to promote a video in featured sorting. Optional quality badges support HD, 2K and 4K. Admin editors assign an editorial score (0–100); it is not a user vote. Top rated sorting uses this score. Most viewed sorting uses video detail page GET visits, including repeat visits; it does not measure completed playback or unique viewers. Search, category filtering and pagination work on published videos.
+In admin, create categories and upload videos with a language, optional thumbnail, description and duration. Videos are private drafts until **is published** is selected. Set **is featured** to promote a video in featured sorting. Optional quality badges support HD, 2K and 4K. Admin editors assign an editorial score (0–100); it is not a user vote. Top rated sorting uses this score. Most viewed sorting uses video detail page GET visits, including repeat visits; it does not measure completed playback or unique viewers. Filters and pagination only expose published videos.
 
-Supported upload extensions: MP4, WebM and OGV. For broad browser compatibility, upload MP4 encoded with H.264 video and AAC audio. There is no automatic transcoding or thumbnail generation. File extension validation does not inspect codecs or file content; upload access is restricted to trusted staff.
+Supported upload extensions: MP4, WebM and OGV. For broad browser compatibility, upload MP4 encoded with H.264 video and AAC audio. Uploaded thumbnails are resized within 1280×720 and compressed to WebP. Videos are not automatically transcoded and thumbnails are not extracted from video files. File extension validation does not inspect codecs or file content; upload access is restricted to trusted staff.
 
 ## Validation
 

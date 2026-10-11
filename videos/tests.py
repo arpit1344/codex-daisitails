@@ -13,7 +13,7 @@ class VideoWorkflowTests(TestCase):
         settings.enable()
         self.addCleanup(settings.disable)
         self.category = Category.objects.create(name='Travel', slug='travel')
-        self.video = Video.objects.create(title='Mountain journey', slug='mountain-journey', category=self.category, file=SimpleUploadedFile('journey.webm', b'upload-test-fixture'), is_published=True)
+        self.video = Video.objects.create(title='Mountain journey', slug='mountain-journey', category=self.category, language='English', duration='4:30', file=SimpleUploadedFile('journey.webm', b'upload-test-fixture'), is_published=True)
         self.draft = Video.objects.create(title='Hidden draft', slug='hidden-draft', file=SimpleUploadedFile('draft.webm', b'upload-test-fixture'))
 
     def test_public_listing_search_and_categories(self):
@@ -36,7 +36,7 @@ class VideoWorkflowTests(TestCase):
     def test_admin_upload_and_publish(self):
         user = get_user_model().objects.create_superuser('manager', 'manager@example.com', 'test-password-only')
         self.client.force_login(user)
-        response = self.client.post(reverse('admin:videos_video_add'), {'title': 'Uploaded video', 'slug': 'uploaded-video', 'description': 'Uploaded through admin', 'category': self.category.pk, 'file': SimpleUploadedFile('uploaded.mp4', b'upload-test-fixture', content_type='video/mp4'), 'duration': '1:00', 'is_published': 'on', 'editor_rating': '80', 'quality': 'HD', '_save': 'Save'})
+        response = self.client.post(reverse('admin:videos_video_add'), {'title': 'Uploaded video', 'slug': 'uploaded-video', 'description': 'Uploaded through admin', 'category': self.category.pk, 'language': 'Hindi', 'file': SimpleUploadedFile('uploaded.mp4', b'upload-test-fixture', content_type='video/mp4'), 'duration': '1:00', 'is_published': 'on', 'editor_rating': '80', 'quality': 'HD', '_save': 'Save'})
         self.assertEqual(response.status_code, 302)
         uploaded = Video.objects.get(slug='uploaded-video')
         self.assertTrue(uploaded.file.storage.exists(uploaded.file.name))
@@ -45,7 +45,7 @@ class VideoWorkflowTests(TestCase):
     def test_admin_rejects_unsupported_file_extension(self):
         user = get_user_model().objects.create_superuser('manager', 'manager@example.com', 'test-password-only')
         self.client.force_login(user)
-        response = self.client.post(reverse('admin:videos_video_add'), {'title': 'Bad upload', 'slug': 'bad-upload', 'editor_rating': '0', 'file': SimpleUploadedFile('script.html', b'<script></script>'), '_save': 'Save'})
+        response = self.client.post(reverse('admin:videos_video_add'), {'title': 'Bad upload', 'slug': 'bad-upload', 'language': 'Hindi', 'editor_rating': '0', 'file': SimpleUploadedFile('script.html', b'<script></script>'), '_save': 'Save'})
         self.assertEqual(response.status_code, 200)
         self.assertFalse(Video.objects.filter(slug='bad-upload').exists())
 
@@ -60,6 +60,29 @@ class VideoWorkflowTests(TestCase):
         second = Video.objects.create(title='Another video', slug='another', file='videos/example.mp4', is_published=True, editor_rating=90, views=100)
         self.assertEqual(self.client.get(reverse('video_list'), {'sort': 'top'}).context['page'][0], second)
         self.assertEqual(self.client.get(reverse('video_list'), {'sort': 'views'}).context['page'][0], second)
+
+    def test_language_and_duration_filters(self):
+        self.assertContains(self.client.get(reverse('video_list'), {'language': 'English'}), self.video.title)
+        self.assertNotContains(self.client.get(reverse('video_list'), {'language': 'Hindi'}), self.video.title)
+        self.assertContains(self.client.get(reverse('video_list'), {'duration': 'short'}), self.video.title)
+        self.assertNotContains(self.client.get(reverse('video_list'), {'duration': 'long'}), self.video.title)
+        self.assertEqual(self.video.duration_seconds, 270)
+
+    def test_cards_have_lazy_thumbnail_and_duration_badge(self):
+        self.video.thumbnail = SimpleUploadedFile('poster.jpg', self._image_bytes(), content_type='image/jpeg')
+        self.video.save()
+        response = self.client.get(reverse('video_list'))
+        self.assertContains(response, 'loading="lazy"')
+        self.assertContains(response, 'class="duration-badge">4:30')
+        self.assertTrue(self.video.thumbnail.name.endswith('.webp'))
+
+    @staticmethod
+    def _image_bytes():
+        from io import BytesIO
+        from PIL import Image
+        output = BytesIO()
+        Image.new('RGB', (1800, 1000), 'red').save(output, 'JPEG')
+        return output.getvalue()
 
     def test_views_only_increment_on_published_get(self):
         self.client.head(self.video.get_absolute_url())

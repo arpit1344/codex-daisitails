@@ -38,7 +38,7 @@ class Command(BaseCommand):
             draw.text((48,42),'DEMO VIDEO',fill=lower)
             out=io.BytesIO()
             image.save(out,format='JPEG',quality=90)
-            video=Video(title=title,slug=slug,category=category,description='Demo entry with original illustrated artwork and a three-second test-pattern clip. Replace it with your own video and thumbnail in the admin panel.',duration='0:03',quality='HD',editor_rating=90-index*3,is_published=True,is_featured=index<2)
+            video=Video(title=title,slug=slug,category=category,language='Hindi' if index % 2 == 0 else 'English',description='Demo entry with original illustrated artwork and a three-second test-pattern clip. Replace it with your own video and thumbnail in the admin panel.',duration='0:03',quality='HD',editor_rating=90-index*3,is_published=True,is_featured=index<2)
             video.file.save(f'{slug}.mp4',ContentFile(clip_bytes),save=False)
             video.thumbnail.save(f'{slug}.jpg',ContentFile(out.getvalue()),save=False)
             video.save()

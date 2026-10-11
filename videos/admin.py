@@ -9,12 +9,12 @@ class CategoryAdmin(admin.ModelAdmin):
     search_fields = ['name']
 @admin.register(Video)
 class VideoAdmin(admin.ModelAdmin):
-    list_display = ['title', 'category', 'is_published', 'is_featured', 'quality', 'editor_rating', 'views', 'created_at']
-    list_filter = ['is_published', 'is_featured', 'category']
+    list_display = ['title', 'category', 'language', 'duration', 'is_published', 'is_featured', 'quality', 'editor_rating', 'views', 'created_at']
+    list_filter = ['is_published', 'is_featured', 'category', 'language', 'quality']
     search_fields = ['title', 'description']
     prepopulated_fields = {'slug': ('title',)}
     list_editable = ['is_published', 'is_featured']
-    readonly_fields = ['created_at', 'views']
+    readonly_fields = ['created_at', 'views', 'duration_seconds']
     actions = ['publish', 'unpublish']
     @admin.action(description='Publish selected videos')
     def publish(self, request, queryset):
