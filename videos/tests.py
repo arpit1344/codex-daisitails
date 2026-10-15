@@ -132,6 +132,21 @@ class VideoWorkflowTests(TestCase):
             self.video.full_clean()
 
 class HostingBootstrapTests(TestCase):
+    def test_password_recovery_requires_active_window(self):
+        import time
+        from unittest.mock import patch
+        from django.core.management import call_command
+        user = get_user_model().objects.create_superuser('recovery-admin', password='old-test-password')
+        password = 'New-test-password-recovery-248!'
+        with patch.dict('os.environ', {'DJANGO_SUPERUSER_USERNAME': user.username, 'DJANGO_SUPERUSER_PASSWORD': password, 'DJANGO_ADMIN_RECOVERY_UNTIL': str(int(time.time()) - 10)}):
+            call_command('bootstrap_admin', verbosity=0)
+        user.refresh_from_db()
+        self.assertTrue(user.check_password('old-test-password'))
+        with patch.dict('os.environ', {'DJANGO_SUPERUSER_USERNAME': user.username, 'DJANGO_SUPERUSER_PASSWORD': password, 'DJANGO_ADMIN_RECOVERY_UNTIL': str(int(time.time()) + 600)}):
+            call_command('bootstrap_admin', verbosity=0)
+        user.refresh_from_db()
+        self.assertTrue(user.check_password(password))
+
     def test_admin_creation_and_repeatability(self):
         from unittest.mock import patch
         from django.core.management import call_command
