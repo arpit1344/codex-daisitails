@@ -48,3 +48,21 @@ class ImportTests(TestCase):
         job.refresh_from_db()
         self.assertEqual(job.status, 'failed')
         self.assertFalse(Video.objects.exists())
+
+    def test_oversized_download_fails_without_creating_video(self):
+        job = VideoImport.objects.create(title='Too large', source_url='https://source.example/clip.mp4', rights_confirmed=True)
+        response = io.BytesIO(b'')
+        response.headers = Message()
+        response.headers['Content-Type'] = 'video/mp4'
+        response.headers['Content-Length'] = '999999999'
+        with patch('videos.importer.validate_source', return_value='.mp4'), patch('videos.importer.build_opener') as opener:
+            opener.return_value.open.return_value = response
+            process_next()
+        job.refresh_from_db()
+        self.assertEqual(job.status, 'failed')
+        self.assertFalse(Video.objects.exists())
+
+    def test_preview_requires_authentication(self):
+        video = Video.objects.create(title='Draft', slug='draft-preview', file='videos/draft.mp4')
+        response = self.client.get(reverse('admin:videos_video_preview', args=[video.pk]))
+        self.assertEqual(response.status_code, 302)
