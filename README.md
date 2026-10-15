@@ -1,5 +1,11 @@
 # Django Video Library
 
+## Import licensed videos
+
+In Render environment settings, set `VIDEO_IMPORT_ALLOWED_HOSTS` to a comma-separated list of exact trusted media hostnames you control or are licensed to download from. It starts empty. In Django admin, open **Video imports**, add a direct HTTPS MP4/WebM/OGV URL, title, description, category, tags and optional thumbnail, then confirm rights. The background worker downloads up to 250 MB (override with `VIDEO_IMPORT_MAX_BYTES`), checks the container signature, and creates a private draft. Redirects and private network sources are rejected. Open **Edit draft, preview and publish** when status is ready. Add language, duration and SEO details, preview, then publish explicitly. Failed imports can be retried with the admin action. This imports direct files; webpage extraction and transcoding are not included.
+
+Production starts the worker alongside the web process; on the free Render plan both pause while the service sleeps. Open the site to wake it. For local development run `python manage.py import_worker` alongside Django, or `python manage.py import_worker --once` to process one job.
+
 A Django video website with a staff-only content management panel. The responsive catalog includes search, category/language/duration filters, latest/popular/top-rated sorting, pagination and a persistent dark-mode toggle.
 
 ## Local setup

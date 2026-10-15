@@ -17,7 +17,7 @@ def video_list(request):
     duration = request.GET.get('duration', '')
     sort = request.GET.get('sort', 'latest')
     if query:
-        videos = videos.filter(Q(title__icontains=query) | Q(description__icontains=query))
+        videos = videos.filter(Q(title__icontains=query) | Q(description__icontains=query) | Q(tags__name__icontains=query)).distinct()
     if category:
         videos = videos.filter(category__slug=category)
     valid_languages = {value for value, _ in Video.LANGUAGE_CHOICES}

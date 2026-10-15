@@ -17,7 +17,15 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+class Tag(models.Model):
+    name = models.CharField(max_length=60, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Video(models.Model):
+    tags = models.ManyToManyField(Tag, blank=True, related_name='videos')
     LANGUAGE_CHOICES = [
         ('Hindi', 'Hindi'), ('English', 'English'), ('Bengali', 'Bengali'),
         ('Punjabi', 'Punjabi'), ('Tamil', 'Tamil'), ('Telugu', 'Telugu'),
@@ -77,3 +85,22 @@ class Video(models.Model):
             name = f'{Path(self.thumbnail.name).stem}.webp'
             self.thumbnail = ContentFile(output.getvalue(), name=name)
         super().save(*args, **kwargs)
+
+
+class VideoImport(models.Model):
+    source_url = models.URLField(max_length=2000, help_text='Direct HTTPS MP4, WebM or OGV link from an allowed source domain.')
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    category = models.ForeignKey(Category, null=True, blank=True, on_delete=models.SET_NULL)
+    tags = models.ManyToManyField(Tag, blank=True)
+    thumbnail = models.ImageField(upload_to='import-thumbnails/', blank=True)
+    rights_confirmed = models.BooleanField(help_text='I own or license this non-explicit video and have permission to import it.')
+    status = models.CharField(max_length=12, default='queued', choices=[('queued', 'Queued'), ('processing', 'Processing'), ('ready', 'Ready for review'), ('failed', 'Failed')], db_index=True)
+    error = models.CharField(max_length=300, blank=True)
+    video = models.OneToOneField(Video, null=True, blank=True, on_delete=models.SET_NULL)
+    created_at = models.DateTimeField(auto_now_add=True)
+    started_at = models.DateTimeField(null=True, blank=True)
+    finished_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return self.title
